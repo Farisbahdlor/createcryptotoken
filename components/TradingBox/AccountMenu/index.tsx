@@ -106,7 +106,7 @@ const AccountMenu = () => {
   
 
   
-  useEffect(() => {
+  useLayoutEffect(() => {
     const interval = setInterval( async () => {
       const token = localStorage.getItem('token');
       
