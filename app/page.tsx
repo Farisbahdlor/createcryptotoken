@@ -4,7 +4,7 @@ import NavigationBar from "@/components/NavBar";
 import TradingBox from "@/components/TradingBox";
 
 // _app.js or a relevant component
-import { useEffect } from 'react';
+import { useLayoutEffect } from 'react';
 import { messaging, getToken } from '@/firebaseConfig';
 
 import { useAccount } from 'wagmi'
@@ -21,7 +21,7 @@ export default function Home() {
   const useraccount = useAccount();
   const useraddress = useraccount.address;
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const interval = setInterval( async () => {
       
       
