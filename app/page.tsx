@@ -1,13 +1,6 @@
 "use client"
-import ConnectWallet from "@/components/connectwallet";
-import NavigationBar from "@/components/NavBar";
+
 import TradingBox from "@/components/TradingBox";
-
-// _app.js or a relevant component
-import { useLayoutEffect } from 'react';
-import { messaging, getToken } from '@/firebaseConfig';
-
-import { useAccount } from 'wagmi'
 
 import dynamic from "next/dynamic";
 
@@ -18,66 +11,6 @@ const FirebaseNotifications = dynamic(
 );
 
 export default function Home() {
-  const useraccount = useAccount();
-  const useraddress = useraccount.address;
-
-  useLayoutEffect(() => {
-    const interval = setInterval( async () => {
-      
-      
-      const token = localStorage.getItem('token');
-
-      console.log(useraddress, "useraddress");
-      console.log(useraddress, "walletaddress");
-      console.log(token, "token");
-      if (!useraddress && token) {
-        // Erase the token from frontend and backend
-        
-        try {
-          await fetch("https://createcryptotoken.xyz/api/logout", {
-              method: 'POST',
-              headers: {
-                  'Authorization': `Bearer ${token}`,
-                  'Content-Type': 'application/json',
-              }
-          });
-          console.log('Token invalidated');
-          localStorage.setItem('token', '');
-        } catch (error) {
-            console.error('Error invalidating token:', error);
-        }
-        localStorage.removeItem('token');
-      }
-      else if (useraddress && !token) {
-        try {
-          const data = {
-            "useraddress": useraddress as string,
-          }
-          console.log('Attempting login with useraddress:', useraddress);
-          const response = await fetch("https://createcryptotoken.xyz/api/login", {
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/json',
-              },
-              body: JSON.stringify(data),
-          });
-
-          if (response.ok) {
-              const data = await response.json();
-              localStorage.setItem('token', data.token);
-              // toast.success('Login successful');
-          } else {
-              throw new Error('Login failed');
-          }
-        } catch (error) {
-            console.error('Error logging in:', error);
-            // toast.error('Login failed');
-        }
-      } 
-    }, 2500)
-    return () => clearInterval(interval)
-    
-  }, []);
 
   return (
     <div>
