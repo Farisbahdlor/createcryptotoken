@@ -2,7 +2,6 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useAccount } from 'wagmi'
 import { setInterval } from 'timers'
-import {chains} from '@/config/index'
 import NativeTokenList from './NativeTokenList'
 import { toast } from 'react-toastify'
 
@@ -35,14 +34,14 @@ const AccountMenu = () => {
 
     const file = e.target.files[0];
     if (file) {
-      // console.log("Selected file:", file);
+      console.log("Selected file:", file);
       const reader = new FileReader();
       reader.readAsArrayBuffer(file);
       reader.onloadend = async() => {
         if (reader.result) {
           const arrayBuffer = reader.result as ArrayBuffer;
           const byteArray = new Uint8Array(arrayBuffer);
-          // console.log("Byte array:", byteArray);
+          console.log("Byte array:", byteArray);
           let userAPI = "https://createcryptotoken.xyz/api/user"
           
           if(imageSrc == undefined){
@@ -61,7 +60,7 @@ const AccountMenu = () => {
               
               })
               const res = await postUser.json();
-              // console.log(res, "postUser JSON response");
+              console.log(res, "postUser JSON response");
               
             } catch (error) {
               console.error('Error:', error);
@@ -115,6 +114,55 @@ const AccountMenu = () => {
       let erc721API = "https://createcryptotoken.xyz/api/erc721/" + useraddress;
       let userAPI = "https://createcryptotoken.xyz/api/user/" + useraddress;
 
+      
+  
+        console.log(useraddress, "useraddress");
+        console.log(useraddress, "walletaddress");
+        console.log(token, "token");
+        if (!useraddress && token) {
+          // Erase the token from frontend and backend
+          
+          try {
+            await fetch("https://createcryptotoken.xyz/api/logout", {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                }
+            });
+            console.log('Token invalidated');
+            localStorage.setItem('token', '');
+          } catch (error) {
+              console.error('Error invalidating token:', error);
+          }
+          localStorage.removeItem('token');
+        }
+        else if (useraddress && !token) {
+          try {
+            const data = {
+              "useraddress": useraddress as string,
+            }
+            console.log('Attempting login with useraddress:', useraddress);
+            const response = await fetch("https://createcryptotoken.xyz/api/login", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            });
+  
+            if (response.ok) {
+                const data = await response.json();
+                localStorage.setItem('token', data.token);
+                // toast.success('Login successful');
+            } else {
+                throw new Error('Login failed');
+            }
+          } catch (error) {
+              console.error('Error logging in:', error);
+              // toast.error('Login failed');
+          }
+        }
       // console.log(useraddress, "useraddress");
       // console.log(useraddress, "walletaddress");
       // console.log(token, "token");
@@ -161,7 +209,7 @@ const AccountMenu = () => {
           console.log(error, "Error");
         }
       
-    }, 2000);
+    }, 5000);
     return () => clearInterval(interval)
   }, []);
 
